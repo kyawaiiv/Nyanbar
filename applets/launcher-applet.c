@@ -120,13 +120,13 @@ static gboolean launcher_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	cairo_set_operator(cr, CAIRO_OPERATOR_ATOP);
 
 	/* fill background color */
-	gdk_rgba_parse(&c, active ? "#0c67da" : "#fafafa");
+	gdk_rgba_parse(&c, active ? highlight_bg : bgcolor);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, 0.80);
 	cairo_paint(cr);
 
 	/* set icon color and paint */
 	icon = cairo_image_surface_create_from_png("/usr/share/icons/NyanBar/Launcher.png");
-	gdk_rgba_parse(&c, active ? "#ffffff" : "#474747");
+	gdk_rgba_parse(&c, active ? highlight_fg : launcher_color);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	cairo_mask_surface(cr, icon, 0, 0);
 }

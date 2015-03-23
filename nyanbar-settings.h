@@ -44,6 +44,11 @@ static const char *clock_primary    = "#32363a";
 
 static const char *separator_color  = "#484848";
 
+static const char *highlight_bg	    = "#0c67da";
+static const char *highlight_fg	    = "#ffffff";
+
+static const char *launcher_color   = "#474747";
+
 /* fonts */
 static int DPI		    = 227;			    /* dots-per-inch for fonts */
 static char *font	    = "Helvetica Neue 9.5";	    /* primary font */
