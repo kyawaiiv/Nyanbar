@@ -47,9 +47,12 @@ Todo:
 * Global menu bar?
 * Minor re-write and cleanup of desktops applet.
 * ~~Major re-write of clock applet.~~
+* Minor cleanup of launcher applet.
+* Restructure rendering to increase responsiveness.
 * Basic mouse support -> clickable 'desktops' selection.
 * Native systray?
 * Dropdown menu from icon. 
+* Add support for other WMs into desktops applet.
 
 Bugs:
 ---

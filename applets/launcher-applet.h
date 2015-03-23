@@ -1,4 +1,4 @@
-/* nyanbar.h
+/* applets/launcher-applet.h
  * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
@@ -16,51 +16,47 @@
  * You should have received a copy of the GNU General Public License
  * along with NyanBar.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef nyan_bar_h
-#define nyan_bar_h
+#ifndef launcher_applet_h
+#define launcher_applet_h
 
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <pango/pango.h>
-#include <cairo/cairo.h>
+#include "nyanbar-applet.h"
 
-typedef struct _NyanBar NyanBar;
-typedef struct _NyanBarClass NyanBarClass;
+typedef struct _LauncherApplet LauncherApplet;
+typedef struct _LauncherAppletClass LauncherAppletClass;
 
-#define NYANBAR_TYPE (nyanbar_get_type())
+#define LAUNCHER_APPLET_TYPE (launcher_applet_get_type())
 
-#define NYANBAR(obj) \
+#define LAUNCHER_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), \
-	NYANBAR_TYPE, NyanBar))
+	LAUNCHER_APPLET_TYPE))
 
-#define IS_NYANBAR(obj) \
+#define IS_LAUNCHER_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_TYPE((obj), \
-	NYANBAR_TYPE))
+	LAUNCHER_APPLET_TYPE))
 
-#define NYANBAR_CLASS(klass), \
+#define LAUNCHER_APPLET_CLASS(klass) \
 	(G_TYPE_CHECK_CLASS_CAST((klass), \
-	NYANBAR_TYPE, NyanBarClass))
+	LAUNCHER_APPLET_TYPE, LauncherAppletClass))
 
-#define IS_NYANBAR_CLASS(klass) \
-	(G_TYPE_CHECK_CLASS_TYPE((klass), NYANBAR_TYPE))
+#define IS_LAUNCHER_APPLET_CLASS(klass) \
+	(G_TYPE_CHECK_CLASS_TYPE((klass), \
+	LAUNCHER_APPLET_TYPE))
 
-#define NYANBAR_GET_CLASS(obj) \
+#define LAUNCHER_APPLET_GET_CLASS(obj) \
 	(G_TYPE_INSTANCE_GET_CLASS((obj), \
-	NYANBAR_TYPE, NyanBarClass))
+	LAUNCHER_APPLET_TYPE, LauncherAppletClass))
 
-struct _NyanBar {
-	GtkWindow parent;
-	GtkWidget *desktops;
-	GtkWidget *clock;
-	GtkWidget *launcher;
+struct _LauncherApplet {
+	BarApplet parent;
+	GtkWidget *da;
 };
 
-struct _NyanBarClass {
-	GtkWindowClass parent_class;
+struct _LauncherAppletClass {
+	BarAppletClass parent_class;
 };
 
-GType nyanbar_get_type(void);
+GType launcher_applet_get_type(void);
 
-NyanBar *nyanbar_new(void);
+GtkWidget *launcher_applet_new(void);
 
 #endif

@@ -20,6 +20,7 @@
 #include "nyanbar-settings.h"
 #include "applets/desktops-applet.h"
 #include "applets/clock-applet.h"
+#include "applets/launcher-applet.h"
 
 G_DEFINE_TYPE(NyanBar, nyanbar, GTK_TYPE_WINDOW)
 
@@ -79,6 +80,7 @@ static void nyanbar_init(NyanBar *self)
 	GtkWidget *menu_icon;
 	GtkWidget *desktops;
 	GtkWidget *clock;
+	GtkWidget *launcher;
 
 	GdkPixbuf *pb;
 
@@ -116,6 +118,11 @@ static void nyanbar_init(NyanBar *self)
 	clock = clock_applet_new();
 	self->clock = clock;
 	gtk_box_set_center_widget(GTK_BOX(layout), clock);
+
+	/* add launcher applet to end*/
+	launcher = launcher_applet_new();
+	self->launcher = launcher;
+	gtk_box_pack_end(GTK_BOX(layout), launcher, FALSE, FALSE, launcher_padding);
 
 	gtk_widget_show_all(GTK_WIDGET(self));
 }

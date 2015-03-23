@@ -26,9 +26,12 @@ static gboolean topbar = TRUE;
 static gint icon_size = 32;
 static gint padding = 34;
 static gint icon_padding = 38;
+static gint launcher_padding = 32;
 
 static gchar *desktops[6] = {"Home", "Term", "Code", "Web", "Chat", "Misc"};
 static gchar *clock_format = "%a %I:%M %p";
+
+static gchar *launcher_app = "/home/trevor/nyanpanel/nyanpanel";
 
 /* colors */
 static const char *bgcolor	    = "#fafafa";
