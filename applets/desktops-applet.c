@@ -31,7 +31,7 @@ static void desktops_applet_init(DesktopsApplet *self);
 static void desktops_applet_class_init(DesktopsAppletClass *klass);
 static void desktops_applet_dispose(GObject *object);
 static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
-static void get_desktops_status(void);
+static gboolean get_desktops_status(GtkWidget *widget);
 
 static void desktops_applet_init(DesktopsApplet *self)
 {
@@ -40,6 +40,7 @@ static void desktops_applet_init(DesktopsApplet *self)
 
 	gtk_container_add(GTK_CONTAINER(self), self->da);
 	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(desktops_applet_draw), NULL);
+	g_timeout_add(50, (GSourceFunc) get_desktops_status, NULL);
 }
 
 static void desktops_applet_class_init(DesktopsAppletClass *klass)
@@ -78,7 +79,7 @@ static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 
 	pango_cairo_context_set_resolution(pango_layout_get_context(plo), DPI);
 	cairo_font_extents(cr, &extents);
-	get_desktops_status();
+	gtk_widget_queue_draw(widget);
 
 	for(i = 0; i < sizeof(desktops) / sizeof(*desktops); i++) {
 		gdk_rgba_parse(&c, desktop_status[i] == 'f' ? desktop_norm : desktop_status[i] == 'u' ? desktop_urg : desktop_occ);
@@ -113,8 +114,10 @@ static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	return FALSE;
 }
 
-static void get_desktops_status(void)
+static gboolean get_desktops_status(GtkWidget *widget)
 {
+	while(g_main_context_pending(NULL))
+		g_main_context_iteration(NULL, FALSE);
 	fd_set set;
 	struct timeval timeout;
 	gint rv;
@@ -127,8 +130,8 @@ static void get_desktops_status(void)
 	FD_ZERO(&set);
 	FD_SET(fd, &set);
 
-	timeout.tv_sec = 1;
-	timeout.tv_usec = 0;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 75000;
 
 	rv = select(fd + 1, &set, NULL, NULL, &timeout);
 	if(rv > 0) {
@@ -154,5 +157,8 @@ static void get_desktops_status(void)
 		}
 		/* last line is tiling state */
 		tiling_state = strtok_r(NULL, ":", &pch);
+		
+		gtk_widget_queue_draw(widget);
 	}
+	return TRUE;
 }

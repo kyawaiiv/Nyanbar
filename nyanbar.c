@@ -97,7 +97,6 @@ static void nyanbar_init(NyanBar *self)
 	g_signal_connect(self, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect(self, "draw", G_CALLBACK(nyanbar_draw), self);
 	g_signal_connect(self, "realize", G_CALLBACK(on_realized), self);
-	g_timeout_add(1000, (GSourceFunc) on_update, (gpointer) self);
 
 	/* init layout */
 	layout = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -137,5 +136,5 @@ static gboolean nyanbar_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	cairo_paint(cr);
 
 	gtk_container_propagate_draw(GTK_CONTAINER(widget), gtk_bin_get_child(GTK_BIN(widget)), cr);
-	return TRUE;
+	return FALSE;
 }	

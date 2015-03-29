@@ -32,7 +32,8 @@ static void launcher_applet_init(LauncherApplet *self);
 static void launcher_applet_class_init(LauncherAppletClass *klass);
 static void launcher_applet_dispose(GObject *object);
 static gboolean launcher_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
-static gboolean button_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean button_released(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 void signal_handler(int sig);
 
 static void launcher_applet_init(LauncherApplet *self)
@@ -41,8 +42,8 @@ static void launcher_applet_init(LauncherApplet *self)
 	gtk_widget_set_size_request(self->da, 60, BARH);
 	gtk_container_add(GTK_CONTAINER(self), self->da);
 	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(launcher_applet_draw), NULL);
-	g_signal_connect(G_OBJECT(self->da), "button_press_event", G_CALLBACK(button_clicked), NULL);
-	g_signal_connect(G_OBJECT(self->da), "button_release_event", G_CALLBACK(button_clicked), NULL);
+	g_signal_connect(G_OBJECT(self->da), "button_press_event", G_CALLBACK(button_pressed), NULL);
+	g_signal_connect(G_OBJECT(self->da), "button_release_event", G_CALLBACK(button_released), NULL);
 
 	gtk_widget_set_events(self->da, gtk_widget_get_events(self->da)
 	    | GDK_BUTTON_PRESS_MASK
@@ -72,43 +73,47 @@ GtkWidget *launcher_applet_new(void)
 
 void signal_handler(int sig)
 {
+	// kill child process but not parent
 	pid_t self = getpid();
 	if(parent_pid != self)
 		_exit(0);
 }
 
-static gboolean button_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+
+static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	if(event->type == GDK_BUTTON_PRESS) {
-	    active = TRUE;
-	    gtk_widget_queue_draw(widget);
+	// event->type == GDK_BUTTON_PRESS
+	active = TRUE;
+	gtk_widget_queue_draw(widget);
 
-	    if(!running) {
-		    parent_pid = getpid();
-		    pid_t pid;
-		    if(pid = fork() == 0)
+	if(!running) {
+		parent_pid = getpid();
+		pid_t pid;
+		if(pid = fork() == 0)
 			execlp(launcher_app, NULL);
-		    running = TRUE;
-		    timediff = event->time;
-	    } else { // process is already running -- kill it
-		    signal(SIGQUIT, signal_handler);
-		    kill(-parent_pid, SIGQUIT);
-		    running = FALSE;
-	    }
+		running = TRUE;
+		timediff = event->time;
+	} else { // process is already running -- kill it with fire
+		signal(SIGQUIT, signal_handler);
+		kill(-parent_pid, SIGQUIT);
+		running = FALSE;
 	}
+	return TRUE;
+}
 
-	if(event->type == GDK_BUTTON_RELEASE) {
-		active = FALSE;
-		gtk_widget_queue_draw(widget);
+static gboolean button_released(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	// event->type == GDK_BUTTON_RELEASE
+	active = FALSE;
+	gtk_widget_queue_draw(widget);
 
-		timediff = event->time - timediff; // detect click length
-		if(running && timediff > 2000) {
-			signal(SIGQUIT, signal_handler);
-			kill(-parent_pid, SIGQUIT);
-			running = FALSE;
-		}
+	timediff = event->time - timediff; // get click length
+
+	if(running && timediff > 1000) { // if click was longer than 1s -- kill child process now
+		signal(SIGQUIT, signal_handler);
+		kill(-parent_pid, SIGQUIT);
+		running = FALSE;
 	}
-
 	return TRUE;
 }
 

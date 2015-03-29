@@ -28,6 +28,7 @@ static void clock_applet_init(ClockApplet *self);
 static void clock_applet_class_init(ClockAppletClass *klass);
 static void clock_applet_dispose(GObject *object);
 static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
+static gboolean on_update(GtkWidget *widget);
 
 static void clock_applet_init(ClockApplet *self)
 {
@@ -35,6 +36,7 @@ static void clock_applet_init(ClockApplet *self)
 	gtk_widget_set_size_request(self->da, 300, BARH);
 	gtk_container_add(GTK_CONTAINER(self), self->da);
 	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(clock_applet_draw), NULL);
+	g_timeout_add(1000, (GSourceFunc) on_update, (gpointer) self);
 }
 
 static void clock_applet_class_init(ClockAppletClass *klass)
@@ -56,6 +58,12 @@ GtkWidget *clock_applet_new(void)
 
 	self = g_object_new(CLOCK_APPLET_TYPE, NULL);
 	return GTK_WIDGET(self);
+}
+
+static gboolean on_update(GtkWidget *widget)
+{
+	gtk_widget_queue_draw(widget);
+	return TRUE;
 }
 
 static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
