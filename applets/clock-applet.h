@@ -28,7 +28,7 @@ typedef struct _ClockAppletClass ClockAppletClass;
 
 #define CLOCK_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), \
-	CLOCK_APPLET_TYPE))
+	CLOCK_APPLET_TYPE, ClockApplet))
 
 #define IS_CLOCK_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_TYPE((obj), \

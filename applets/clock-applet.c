@@ -33,9 +33,8 @@ static gboolean on_update(GtkWidget *widget);
 static void clock_applet_init(ClockApplet *self)
 {
 	self->da = gtk_drawing_area_new();
-	gtk_widget_set_size_request(self->da, 300, BARH);
 	gtk_container_add(GTK_CONTAINER(self), self->da);
-	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(clock_applet_draw), NULL);
+	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(clock_applet_draw), self);
 	g_timeout_add(1000, (GSourceFunc) on_update, (gpointer) self);
 }
 
@@ -75,6 +74,7 @@ static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_
 	time_t current;
 	time(&current);
 	gchar buf[13];
+	gint w;
 
 	plo = pango_cairo_create_layout(cr);
 	pfd = pango_font_description_from_string(clock_font);
@@ -91,4 +91,7 @@ static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	cairo_move_to(cr, 0, 0.5 - extents.descent + extents.height / 2);
 	pango_cairo_show_layout(cr, plo);
+
+	pango_layout_get_pixel_size(plo, &w, NULL);
+	gtk_widget_set_size_request(CLOCK_APPLET(user_data)->da, w, BARH);
 }
