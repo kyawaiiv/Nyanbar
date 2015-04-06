@@ -1,5 +1,5 @@
 /* nyanbar-settings.h
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -29,29 +29,14 @@ static gint icon_padding = 38;
 static gint launcher_padding = 32;
 
 static gchar *desktops[6] = {"Home", "Term", "Code", "Web", "Chat", "Misc"};
+static gboolean center_clock = FALSE;
 static gchar *clock_format = "%a %I:%M %p";
 
 static gchar *launcher_app = "/home/trevor/nyanpanel/nyanpanel";
 
-/* colors */
-static const char *bgcolor	    = "#fafafa";
-
-static const char *desktop_norm	    = "#bdbdbd";
-static const char *desktop_occ	    = "#484848";
-static const char *desktop_urg	    = "#136ae2";
-
-static const char *clock_primary    = "#32363a";
-
-static const char *separator_color  = "#484848";
-
-static const char *highlight_bg	    = "#0c67da";
-static const char *highlight_fg	    = "#ffffff";
-
-static const char *launcher_color   = "#474747";
+static gchar *theme = "nyanbar-dark";
 
 /* fonts */
 static int DPI		    = 227;			    /* dots-per-inch for fonts */
-static char *font	    = "Helvetica Neue 9.5";	    /* primary font */
-static char *clock_font	    = "Helvetica Neue 9";	    /* clock applet font */
 
 #endif

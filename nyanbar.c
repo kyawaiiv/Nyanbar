@@ -1,5 +1,5 @@
 /* nyanbar.c
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -21,6 +21,13 @@
 #include "applets/desktops-applet.h"
 #include "applets/clock-applet.h"
 #include "applets/launcher-applet.h"
+
+#include <string.h>
+#include <stdlib.h>
+
+#include <pwd.h>
+#include <stdio.h>
+#include <sys/types.h>
 
 G_DEFINE_TYPE(NyanBar, nyanbar, GTK_TYPE_WINDOW)
 
@@ -69,7 +76,6 @@ static gboolean on_update(GtkWidget *widget)
 	gtk_widget_queue_draw(widget);
 	return TRUE;
 }
-
 static void nyanbar_init(NyanBar *self)
 {
 	GdkScreen *screen;
@@ -83,6 +89,10 @@ static void nyanbar_init(NyanBar *self)
 	GtkWidget *launcher;
 
 	GdkPixbuf *pb;
+
+	GKeyFile *settings;
+	gchar *color, *font;
+	GError *error = NULL;
 
 	/* init window properties */
 	gtk_widget_set_app_paintable(GTK_WIDGET(self), TRUE);
@@ -113,25 +123,75 @@ static void nyanbar_init(NyanBar *self)
 	self->desktops = desktops;
 	gtk_box_pack_start(GTK_BOX(layout), desktops, FALSE, FALSE, 0);
 
-	/* add clock widget to center */
-	clock = clock_applet_new();
-	self->clock = clock;
-	gtk_box_set_center_widget(GTK_BOX(layout), clock);
-
 	/* add launcher applet to end*/
 	launcher = launcher_applet_new();
 	self->launcher = launcher;
 	gtk_box_pack_end(GTK_BOX(layout), launcher, FALSE, FALSE, launcher_padding);
 
+	/* add clock widget to center | end */
+	clock = clock_applet_new();
+	self->clock = clock;
+	if(center_clock)
+		gtk_box_set_center_widget(GTK_BOX(layout), clock);
+	else
+		gtk_box_pack_end(GTK_BOX(layout), clock, FALSE, FALSE, 0);
+
+	/* load settings */
+	struct passwd *passwdEnt = getpwuid(getuid());
+	char *path = passwdEnt->pw_dir;
+	settings = g_key_file_new();
+	strcat(path, "/.nyanbar/themes/");
+	strcat(path, theme);
+
+	g_key_file_load_from_file(settings, path, G_KEY_FILE_NONE, &error);
+	self->font = g_key_file_get_string(settings, "NyanBar", "font", &error);
+
+	/* main / fallback colors */
+	self->bgcolor = g_key_file_get_string(settings, "NyanBar", "background-color", &error);
+	self->fgcolor = g_key_file_get_string(settings, "NyanBar", "foreground-color", &error);
+	self->highlight = g_key_file_get_string(settings, "NyanBar", "highlight-color", &error);
+
+	/* fonts */
+	font = g_key_file_get_string(settings, "Clock Applet", "font", &error);
+	CLOCK_APPLET(clock)->font = font != NULL ? font : self->font;
+
+	font = g_key_file_get_string(settings, "Desktops Applet", "font", &error);
+	DESKTOPS_APPLET(desktops)->font = font != NULL ? font : self->font;
+
+	/* desktops colors */
+	color = g_key_file_get_string(settings, "Desktops Applet", "foreground-normal", &error);
+	DESKTOPS_APPLET(desktops)->norm_fg = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Desktops Applet", "foreground-occupied", &error);
+	DESKTOPS_APPLET(desktops)->occ_fg = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Desktops Applet", "foreground-urgent", &error);
+	DESKTOPS_APPLET(desktops)->urg_fg = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Desktops Applet", "separator-color", &error);
+	DESKTOPS_APPLET(desktops)->separator_color = color != NULL ? color : self->fgcolor;
+
+	/* clock colors*/
+	color = g_key_file_get_string(settings, "Clock Applet", "color", &error);
+	CLOCK_APPLET(clock)->color = color != NULL ? color : self->fgcolor;
+
+	/* launcher colors */
+	color = g_key_file_get_string(settings, "Launcher Applet", "normal-fg", &error);
+	LAUNCHER_APPLET(launcher)->norm_fg = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Launcher Applet", "normal-bg", &error);
+	LAUNCHER_APPLET(launcher)->norm_bg = color != NULL ? color : self->bgcolor;
+	color = g_key_file_get_string(settings, "Launcher Applet", "highlight-fg", &error);
+	LAUNCHER_APPLET(launcher)->highlight_fg = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Launcher Applet", "highlight-bg", &error);
+	LAUNCHER_APPLET(launcher)->highlight_bg = color != NULL ? color : self->highlight;
+
+
 	gtk_widget_show_all(GTK_WIDGET(self));
 }
 
-static gboolean nyanbar_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+static gboolean nyanbar_draw(GtkWidget *widget, cairo_t *cr, gpointer userdata)
 {
 	GdkRGBA c;
 
 	pango_cairo_create_layout(cr);
-	gdk_rgba_parse(&c, bgcolor);
+	gdk_rgba_parse(&c, NYANBAR(userdata)->bgcolor);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, 0.80);
 	cairo_paint(cr);
 

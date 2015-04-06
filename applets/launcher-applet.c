@@ -1,5 +1,5 @@
 /* applets/launcher-applet.c
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -41,7 +41,7 @@ static void launcher_applet_init(LauncherApplet *self)
 	self->da = gtk_drawing_area_new();
 	gtk_widget_set_size_request(self->da, 60, BARH);
 	gtk_container_add(GTK_CONTAINER(self), self->da);
-	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(launcher_applet_draw), NULL);
+	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(launcher_applet_draw), self);
 	g_signal_connect(G_OBJECT(self->da), "button_press_event", G_CALLBACK(button_pressed), NULL);
 	g_signal_connect(G_OBJECT(self->da), "button_release_event", G_CALLBACK(button_released), NULL);
 
@@ -125,13 +125,15 @@ static gboolean launcher_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	cairo_set_operator(cr, CAIRO_OPERATOR_ATOP);
 
 	/* fill background color */
-	gdk_rgba_parse(&c, active ? highlight_bg : bgcolor);
+	gdk_rgba_parse(&c, active ? LAUNCHER_APPLET(user_data)->highlight_bg
+		       : LAUNCHER_APPLET(user_data)->norm_bg);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, 0.80);
 	cairo_paint(cr);
 
 	/* set icon color and paint */
 	icon = cairo_image_surface_create_from_png("/usr/share/icons/NyanBar/Launcher.png");
-	gdk_rgba_parse(&c, active ? highlight_fg : launcher_color);
+	gdk_rgba_parse(&c, active ? LAUNCHER_APPLET(user_data)->highlight_fg
+		       : LAUNCHER_APPLET(user_data)->norm_fg);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	cairo_mask_surface(cr, icon, 0, 0);
 }

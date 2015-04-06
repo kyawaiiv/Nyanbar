@@ -1,5 +1,5 @@
 /* applets/desktops-applet.c
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -39,7 +39,7 @@ static void desktops_applet_init(DesktopsApplet *self)
 	gtk_widget_set_size_request(self->da, BARW / 3, BARH);
 
 	gtk_container_add(GTK_CONTAINER(self), self->da);
-	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(desktops_applet_draw), NULL);
+	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(desktops_applet_draw), self);
 	g_timeout_add(50, (GSourceFunc) get_desktops_status, NULL);
 }
 
@@ -75,14 +75,18 @@ static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	gint i;
 
 	plo = pango_cairo_create_layout(cr);
-	pfd = pango_font_description_from_string(font);
+	pfd = pango_font_description_from_string(DESKTOPS_APPLET(user_data)->font);
 
 	pango_cairo_context_set_resolution(pango_layout_get_context(plo), DPI);
 	cairo_font_extents(cr, &extents);
 	gtk_widget_queue_draw(widget);
 
 	for(i = 0; i < sizeof(desktops) / sizeof(*desktops); i++) {
-		gdk_rgba_parse(&c, desktop_status[i] == 'f' ? desktop_norm : desktop_status[i] == 'u' ? desktop_urg : desktop_occ);
+		gdk_rgba_parse(&c, desktop_status[i] == 'f' 
+			       ? DESKTOPS_APPLET(user_data)->norm_fg
+			       : desktop_status[i] == 'u'
+			       ? DESKTOPS_APPLET(user_data)->urg_fg
+			       : DESKTOPS_APPLET(user_data)->occ_fg);
 		cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 
 		pango_font_description_set_weight(pfd, desktop_status[i] == 'O' || desktop_status[i] == 'F' ? PANGO_WEIGHT_ULTRABOLD : 450);
@@ -98,7 +102,7 @@ static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	pango_layout_set_font_description(plo, pfd);
 	pango_font_description_free(pfd);
 
-	gdk_rgba_parse(&c, separator_color);
+	gdk_rgba_parse(&c, DESKTOPS_APPLET(user_data)->separator_color);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	cairo_set_line_width(cr, 1);
 	
@@ -108,6 +112,8 @@ static gboolean desktops_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 	x += padding;
 
 	cairo_move_to(cr, x, 0.5 - extents.descent + extents.height / 2);
+	gdk_rgba_parse(&c, DESKTOPS_APPLET(user_data)->occ_fg);
+	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	pango_layout_set_text(plo, tiling_state, -1);
 	pango_cairo_show_layout(cr, plo);
 

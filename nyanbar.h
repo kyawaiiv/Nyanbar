@@ -1,5 +1,5 @@
 /* nyanbar.h
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -23,6 +23,7 @@
 #include <gdk/gdk.h>
 #include <pango/pango.h>
 #include <cairo/cairo.h>
+#include "nyanbar-applet.h"
 
 typedef struct _NyanBar NyanBar;
 typedef struct _NyanBarClass NyanBarClass;
@@ -53,6 +54,11 @@ struct _NyanBar {
 	GtkWidget *desktops;
 	GtkWidget *clock;
 	GtkWidget *launcher;
+
+	gchar *font;
+	gchar *bgcolor;
+	gchar *fgcolor;
+	gchar *highlight;
 };
 
 struct _NyanBarClass {

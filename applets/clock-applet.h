@@ -1,5 +1,5 @@
 /* applets/clock-applet.h
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -49,6 +49,9 @@ typedef struct _ClockAppletClass ClockAppletClass;
 struct _ClockApplet {
 	BarApplet parent;
 	GtkWidget *da;
+
+	gchar *font;
+	gchar *color;
 };
 
 struct _ClockAppletClass {

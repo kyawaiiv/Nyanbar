@@ -1,5 +1,5 @@
 /* applets/clock-applet.c
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -77,7 +77,7 @@ static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_
 	gint w;
 
 	plo = pango_cairo_create_layout(cr);
-	pfd = pango_font_description_from_string(clock_font);
+	pfd = pango_font_description_from_string(CLOCK_APPLET(user_data)->font);
 	pango_font_description_set_weight(pfd, 450);
 	pango_layout_set_font_description(plo, pfd);
 	pango_font_description_free(pfd);
@@ -87,7 +87,7 @@ static gboolean clock_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_
 
 	strftime(buf, 13, clock_format, localtime(&current));
 	pango_layout_set_text(plo, buf, -1);
-	gdk_rgba_parse(&c, clock_primary);
+	gdk_rgba_parse(&c, CLOCK_APPLET(user_data)->color);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, c.alpha);
 	cairo_move_to(cr, 0, 0.5 - extents.descent + extents.height / 2);
 	pango_cairo_show_layout(cr, plo);

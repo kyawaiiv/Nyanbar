@@ -36,7 +36,11 @@ _where "xx" equals the bar height - border width in pixels._
 
 If you prefer the bar to be at the bottom of the screen, change the 'topbar' variable to FALSE in nyanbar-settings.h and use `bottom_padding` instead of `top_padding` in your bspwm config file.
 
-**Important:** The Arch Linux icon needs to be manually copied to _/usr/share/icons/NyanBar/_. The path is hardcoded right now but will be able to be changed eventually.
+**Important:** The icons needs to be manually copied to _/usr/share/icons/NyanBar/_. The path is hardcoded and probably won't change.
+
+**Themes:**
+
+I have added basic theme support. Themes are selected by changing the 'theme' variable in nyanbar-settings.h to the theme's filename. Available themes need to be manually copied to _$HOME/.nyanbar/themes_.
 
 **Fonts:**
 
@@ -44,23 +48,24 @@ If you prefer the bar to be at the bottom of the screen, change the 'topbar' var
 
 Todo:
 ---
-* Global menu bar?
+* Global menu bar (wishful thinking)?
 * Minor re-write and cleanup of desktops applet.
 * ~~Major re-write of clock applet.~~
 * Minor cleanup of launcher applet.
-* Restructure rendering to increase responsiveness.
+* ~~Restructure rendering to increase responsiveness.~~
 * Basic mouse support -> clickable 'desktops' selection.
 * Native systray?
-* Dropdown menu from icon. 
+* Dropdown menu from distro icon. 
 * Add support for other WMs into desktops applet.
+* Expand 'theme' support and restructure applet settings.
 
 Bugs:
 ---
-* Desktops status is not shown correctly if updated more than once per second.
+* ~~Desktops status is not shown correctly if updated more than once per second.~~
 * ~~Desktops status does not always update automatically (without external event).~~
 
 License:
 ---
 This project is licensed under version 3 of the GNU General Public License. A copy of the license has been provided, see `COPYING`.
 
-Copyright © 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+Copyright © 2015 Trevor Kulhanek <trevor@nocodenolife.com>

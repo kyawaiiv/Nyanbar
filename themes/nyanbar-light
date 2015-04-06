@@ -1,0 +1,23 @@
+# NyanBar Light Theme
+
+[NyanBar]
+font = Helvetica Neue 9
+background-color = #fbfbfa
+foreground-color = #484848
+highlight-color = #0c67da
+
+[Desktops Applet]
+foreground-normal	= #bdbdbd
+foreground-occupied	= #484848
+foreground-urgent	= #136ae2
+separator-color		= #484848
+
+[Clock Applet]
+font = Helvetica Neue 9
+color = #4d4d4d
+
+[Launcher Applet]
+normal-fg	= #4c4c4c
+normal-bg	= #fbfbfa
+highlight-fg	= #ffffff
+highlight-bg	= #0c67da

@@ -1,5 +1,5 @@
 /* applets/desktops-applet.h
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -49,6 +49,12 @@ typedef struct _DesktopsAppletClass DesktopsAppletClass;
 struct _DesktopsApplet {
 	BarApplet parent;
 	GtkWidget *da;
+
+	gchar *font;
+	gchar *norm_fg;
+	gchar *occ_fg;
+	gchar *urg_fg;
+	gchar *separator_color;
 };
 
 struct _DesktopsAppletClass {

@@ -1,5 +1,5 @@
 /* applets/launcher-applet.h
- * Copyright (C) 2014 Trevor Kulhanek <trevor@nocodenolife.com>
+ * Copyright (C) 2015 Trevor Kulhanek <trevor@nocodenolife.com>
  *
  * This file is part of NyanBar.
  *
@@ -28,7 +28,7 @@ typedef struct _LauncherAppletClass LauncherAppletClass;
 
 #define LAUNCHER_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), \
-	LAUNCHER_APPLET_TYPE))
+	LAUNCHER_APPLET_TYPE, LauncherApplet))
 
 #define IS_LAUNCHER_APPLET(obj) \
 	(G_TYPE_CHECK_INSTANCE_TYPE((obj), \
@@ -49,6 +49,11 @@ typedef struct _LauncherAppletClass LauncherAppletClass;
 struct _LauncherApplet {
 	BarApplet parent;
 	GtkWidget *da;
+
+	gchar *norm_fg;
+	gchar *norm_bg;
+	gchar *highlight_fg;
+	gchar *highlight_bg;
 };
 
 struct _LauncherAppletClass {
