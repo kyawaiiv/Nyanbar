@@ -2,22 +2,32 @@
 
 [NyanBar]
 font = Helvetica Neue 9
-background-color = #fbfbfa
-foreground-color = #484848
-highlight-color = #0c67da
+background-color    = #fbfbfa
+foreground-color    = #484848
+highlight-color	    = #0c67da
 
 [Desktops Applet]
-foreground-normal	= #bdbdbd
-foreground-occupied	= #484848
-foreground-urgent	= #136ae2
-separator-color		= #484848
+foreground-normal   = #bdbdbd
+foreground-occupied = #484848
+foreground-urgent   = #136ae2
+separator-color	    = #484848
 
 [Clock Applet]
 font = Helvetica Neue 9
-color = #4d4d4d
+color		    = #4d4d4d
 
 [Launcher Applet]
-normal-fg	= #4c4c4c
-normal-bg	= #fbfbfa
-highlight-fg	= #ffffff
-highlight-bg	= #0c67da
+normal-fg	    = #4c4c4c
+normal-bg	    = #fbfbfa
+highlight-fg	    = #ffffff
+highlight-bg	    = #0c67da
+
+[Menu Applet]
+font = Helvetica Neue 10
+background-color    = #f7f7f7
+foreground-color    = #444444
+highlight	    = #0069d9
+separator-color	    = #e6e6e6
+icon-foreground	    = #484848
+icon-normal-bg	    = #fbfbfa
+icon-highlight-bg   = #0c67da

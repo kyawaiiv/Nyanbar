@@ -21,6 +21,10 @@
 #include "applets/desktops-applet.h"
 #include "applets/clock-applet.h"
 #include "applets/launcher-applet.h"
+#include "applets/menu-applet.h"
+#include "applets/menuitem-applet.h"
+#include "applets/menubar-applet.h"
+#include "applets/menu-separator-applet.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -76,6 +80,7 @@ static gboolean on_update(GtkWidget *widget)
 	gtk_widget_queue_draw(widget);
 	return TRUE;
 }
+
 static void nyanbar_init(NyanBar *self)
 {
 	GdkScreen *screen;
@@ -83,12 +88,10 @@ static void nyanbar_init(NyanBar *self)
 
 	GtkWidget *layout;
 
-	GtkWidget *menu_icon;
 	GtkWidget *desktops;
 	GtkWidget *clock;
 	GtkWidget *launcher;
-
-	GdkPixbuf *pb;
+	GtkWidget *menu;
 
 	GKeyFile *settings;
 	gchar *color, *font;
@@ -113,12 +116,11 @@ static void nyanbar_init(NyanBar *self)
 	gtk_widget_set_valign(layout, GTK_ALIGN_START);
 	gtk_container_add(GTK_CONTAINER(self), layout);
 
-	/* display arch linux icon */
-	pb = gdk_pixbuf_new_from_file_at_scale("/usr/share/icons/NyanBar/ArchLinux.svg", icon_size, icon_size, TRUE, NULL);
-	menu_icon = gtk_image_new_from_pixbuf(pb);
-	gtk_box_pack_start(GTK_BOX(layout), menu_icon, FALSE, FALSE, icon_padding);
+	/* add menu applet */
+	menu = menu_applet_new();
+	gtk_box_pack_start(GTK_BOX(layout), menu, FALSE, FALSE, 20);
 
-	/* add desktops widget */
+	/* add desktops applet */
 	desktops = desktops_applet_new();
 	self->desktops = desktops;
 	gtk_box_pack_start(GTK_BOX(layout), desktops, FALSE, FALSE, 0);
@@ -128,7 +130,7 @@ static void nyanbar_init(NyanBar *self)
 	self->launcher = launcher;
 	gtk_box_pack_end(GTK_BOX(layout), launcher, FALSE, FALSE, launcher_padding);
 
-	/* add clock widget to center | end */
+	/* add clock applet to center | end */
 	clock = clock_applet_new();
 	self->clock = clock;
 	if(center_clock)
@@ -182,16 +184,72 @@ static void nyanbar_init(NyanBar *self)
 	color = g_key_file_get_string(settings, "Launcher Applet", "highlight-bg", &error);
 	LAUNCHER_APPLET(launcher)->highlight_bg = color != NULL ? color : self->highlight;
 
+	/* create menu */
+	MenuitemApplet *menu_sleep;
+	menu_sleep = menuitem_applet_new("Sleep", NULL);
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_sleep));
+
+	MenuitemApplet *menu_restart;
+	menu_restart = menuitem_applet_new("Restart...", "");
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_restart));
+
+	MenuitemApplet *menu_shutdown;
+	menu_shutdown = menuitem_applet_new("Shut Down...", "");
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_shutdown));
+
+	GtkWidget *separator;
+	separator = menu_separator_applet_new();
+	menubar_applet_add(MENU_APPLET(menu)->menubar, separator);
+	
+	MenuitemApplet *menu_logout;
+	menu_logout = menuitem_applet_new("Log Out...", "");
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_logout));
+
+	/* TODO: settings should be set on object init
+		 so that all instances inherit settings? */ 	
+	int i;
+	for(i = 0; i < MENU_APPLET(menu)->menubar->size; i++) {
+		/* Menu items should not draw own (normal) bg color!
+		color = g_key_file_get_string(settings, "Menu Applet", "background-color", &error);
+		MENU_APPLET(menu)->menubar->menus[i]->bgcolor = color != NULL ? color : self->bgcolor;
+		*/
+		color = g_key_file_get_string(settings, "Menu Applet", "foreground-color", &error);
+		MENU_APPLET(menu)->menubar->menus[i]->fgcolor = color != NULL ? color : self->fgcolor;
+
+		color = g_key_file_get_string(settings, "Menu Applet", "highlight", &error);
+		MENU_APPLET(menu)->menubar->menus[i]->highlight = color != NULL ? color : self->highlight;
+
+		font = g_key_file_get_string(settings, "Menu Applet", "font", &error);
+		MENU_APPLET(menu)->menubar->menus[i]->font = font;
+	}
+
+	/* menu window bg color */
+	color = g_key_file_get_string(settings, "Menu Applet", "background-color", &error);
+	MENU_APPLET(menu)->menubar->bgcolor = color != NULL ? color : self->bgcolor;
+
+	/* menu separator color */
+	color = g_key_file_get_string(settings, "Menu Applet", "separator-color", &error);
+	MENU_SEPARATOR_APPLET(separator)->color = color != NULL ? color : self->fgcolor;
+
+	/* menu applet icon colors */
+	color = g_key_file_get_string(settings, "Menu Applet", "icon-foreground", &error);
+	MENU_APPLET(menu)->fgcolor = color != NULL ? color : self->bgcolor;
+
+	color = g_key_file_get_string(settings, "Menu Applet", "icon-normal-bg", &error);
+	MENU_APPLET(menu)->bgcolor = color != NULL ? color : self->bgcolor;
+
+	color = g_key_file_get_string(settings, "Menu Applet", "icon-highlight-bg", &error);
+	MENU_APPLET(menu)->hlcolor = color != NULL ? color : self->bgcolor;
 
 	gtk_widget_show_all(GTK_WIDGET(self));
 }
 
-static gboolean nyanbar_draw(GtkWidget *widget, cairo_t *cr, gpointer userdata)
+static gboolean nyanbar_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	GdkRGBA c;
 
 	pango_cairo_create_layout(cr);
-	gdk_rgba_parse(&c, NYANBAR(userdata)->bgcolor);
+	gdk_rgba_parse(&c, NYANBAR(user_data)->bgcolor);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, 0.80);
 	cairo_paint(cr);
 

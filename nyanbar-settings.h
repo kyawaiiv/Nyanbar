@@ -28,6 +28,10 @@ static gint padding = 34;
 static gint icon_padding = 38;
 static gint launcher_padding = 32;
 
+static gint menu_w = 534;
+static gint menu_padding = 42;
+static gdouble menu_separator_w = 4;
+
 static gchar *desktops[6] = {"Home", "Term", "Code", "Web", "Chat", "Misc"};
 static gboolean center_clock = FALSE;
 static gchar *clock_format = "%a %I:%M %p";
@@ -37,6 +41,6 @@ static gchar *launcher_app = "/home/trevor/nyanpanel/nyanpanel";
 static gchar *theme = "nyanbar-dark";
 
 /* fonts */
-static int DPI		    = 227;			    /* dots-per-inch for fonts */
+static int DPI = 227;			    /* dots-per-inch for fonts */
 
 #endif

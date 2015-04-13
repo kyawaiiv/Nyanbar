@@ -12,7 +12,11 @@ SOURCES	= nyanbar-main.c \
 	  nyanbar-applet.c \
 	  applets/clock-applet.c \
 	  applets/desktops-applet.c \
-	  applets/launcher-applet.c
+	  applets/launcher-applet.c \
+	  applets/menu-applet.c \
+	  applets/menuitem-applet.c \
+	  applets/menubar-applet.c \
+	  applets/menu-separator-applet.c
 
 ${PROG}: ${PROG}.c
 	@${CC} ${SOURCES} ${CFLAGS} ${LIBS} -o ${PROG}
