@@ -27,7 +27,7 @@ static void menubar_applet_class_init(MenubarAppletClass *klass);
 static void menubar_applet_dispose(GObject *object);
 static gboolean menubar_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
 static gboolean on_update(GtkWidget *widget);
-static gboolean button_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+static gboolean on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 static void on_realized(GtkWidget *widget, gpointer user_data);
 
 static void menubar_applet_init(MenubarApplet *self)
@@ -47,6 +47,10 @@ static void menubar_applet_init(MenubarApplet *self)
 
 	g_signal_connect(self, "draw", G_CALLBACK(menubar_applet_draw), self);
 	g_signal_connect(self, "realize", G_CALLBACK(on_realized), self);
+	g_signal_connect(self, "button_release_event", G_CALLBACK(on_click), self);
+
+	gtk_widget_set_events(GTK_WIDGET(self), gtk_widget_get_events(GTK_WIDGET(self))
+		| GDK_BUTTON_RELEASE_MASK);
 
 	self->layout = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	gtk_widget_set_valign(self->layout, GTK_ALIGN_START);
@@ -71,7 +75,13 @@ MenubarApplet *menubar_applet_new(void)
 	MenubarApplet *self;
 
 	self = g_object_new(MENUBAR_APPLET_TYPE, NULL);
+	self->active = FALSE;
 	return self;
+}
+
+void menubar_applet_set_owner(MenubarApplet *menu, GtkWidget *owner)
+{
+	menu->owner = owner;
 }
 
 static void on_realized(GtkWidget *widget, gpointer user_data)
@@ -88,22 +98,33 @@ static gboolean on_update(GtkWidget *widget)
 	return TRUE;
 }
 
+static gboolean on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	menubar_applet_hide(MENUBAR_APPLET(user_data));
+}
+
 void menubar_applet_add(MenubarApplet *menu, GtkWidget *menuitem)
 {
 	if(IS_MENUITEM_APPLET(menuitem)) {
+		MENUITEM_APPLET(menuitem)->owner = GTK_WIDGET(menu);
 		menu->menus[menu->size] = MENUITEM_APPLET(menuitem);
 		menu->size++;
 	}
 	gtk_box_pack_start(GTK_BOX(menu->layout), menuitem, FALSE, FALSE, 5);
 }
 
-void menubar_applet_show(MenubarApplet *menu, gpointer user_data)
+void menubar_applet_show(MenubarApplet *menu)
 {
+	menu->active = menu->active == TRUE ? FALSE : TRUE;
+	gtk_widget_queue_draw(menu->owner);
 	gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
-void menubar_applet_hide(MenubarApplet *menu, gpointer user_data)
+void menubar_applet_hide(MenubarApplet *menu)
 {
+	gtk_widget_queue_draw(menu->owner);
+	menu->active = menu->active == TRUE ? FALSE : TRUE;
+
 	gtk_widget_hide(GTK_WIDGET(menu));
 }
 

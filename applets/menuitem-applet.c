@@ -18,6 +18,7 @@
  */
 #include "menuitem-applet.h"
 #include "nyanbar-settings.h"
+#include "menubar-applet.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +32,7 @@ static gboolean menuitem_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer us
 static gboolean on_update(GtkWidget *widget);
 static gboolean on_enter(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 static gboolean on_leave(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+static gboolean on_click(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 
 static void menuitem_applet_init(MenuitemApplet *self)
 {
@@ -39,10 +41,12 @@ static void menuitem_applet_init(MenuitemApplet *self)
 	g_signal_connect(G_OBJECT(self->da), "draw", G_CALLBACK(menuitem_applet_draw), self);
 	g_signal_connect(G_OBJECT(self->da), "enter-notify-event", G_CALLBACK(on_enter), self);
 	g_signal_connect(G_OBJECT(self->da), "leave-notify-event", G_CALLBACK(on_leave), self);
+	g_signal_connect(G_OBJECT(self->da), "button_press_event", G_CALLBACK(on_click), self);
 
 	gtk_widget_set_events(self->da, gtk_widget_get_events(self->da)
 		| GDK_ENTER_NOTIFY_MASK
-		| GDK_LEAVE_NOTIFY_MASK);
+		| GDK_LEAVE_NOTIFY_MASK
+		| GDK_BUTTON_PRESS_MASK);
 
 	self->selected = FALSE;
 }
@@ -61,7 +65,7 @@ static void menuitem_applet_dispose(GObject *object)
 }
 
 
-MenuitemApplet *menuitem_applet_new(gchar *label, gchar *command)
+MenuitemApplet *menuitem_applet_new(gchar *label, gpointer command)
 {
 	MenuitemApplet *self;
 	self = g_object_new(MENUITEM_APPLET_TYPE, NULL);
@@ -83,6 +87,13 @@ static gboolean on_leave(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 	MENUITEM_APPLET(user_data)->selected = FALSE;
 	gtk_widget_queue_draw(widget);
 	return TRUE;
+}
+
+static gboolean on_click(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+	menubar_applet_hide(MENUBAR_APPLET(MENUITEM_APPLET(user_data)->owner));
+	MENUITEM_APPLET(user_data)->selected = FALSE;
+	MENUITEM_APPLET(user_data)->command();
 }
 
 static gboolean menuitem_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data)

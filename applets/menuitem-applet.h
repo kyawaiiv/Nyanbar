@@ -48,9 +48,10 @@ typedef struct _MenuitemAppletClass MenuitemAppletClass;
 
 struct _MenuitemApplet {
 	BarApplet parent;
+	GtkWidget *owner;
 	GtkWidget *da;
 	gchar *label;
-	gchar *command;
+	void (*command) ();
 	gchar *font;
 	gchar *bgcolor;
 	gchar *fgcolor;
@@ -64,6 +65,6 @@ struct _MenuitemAppletClass {
 
 GType menuitem_applet_get_type(void);
 
-MenuitemApplet *menuitem_applet_new(gchar *label, gchar *command);
+MenuitemApplet *menuitem_applet_new(gchar *label, gpointer command);
 
 #endif

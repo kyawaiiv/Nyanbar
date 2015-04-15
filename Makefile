@@ -16,7 +16,8 @@ SOURCES	= nyanbar-main.c \
 	  applets/menu-applet.c \
 	  applets/menuitem-applet.c \
 	  applets/menubar-applet.c \
-	  applets/menu-separator-applet.c
+	  applets/menu-separator-applet.c \
+	  applets/MenuAction.c
 
 ${PROG}: ${PROG}.c
 	@${CC} ${SOURCES} ${CFLAGS} ${LIBS} -o ${PROG}

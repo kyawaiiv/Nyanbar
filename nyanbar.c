@@ -25,6 +25,7 @@
 #include "applets/menuitem-applet.h"
 #include "applets/menubar-applet.h"
 #include "applets/menu-separator-applet.h"
+#include "applets/MenuAction.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -185,24 +186,40 @@ static void nyanbar_init(NyanBar *self)
 	LAUNCHER_APPLET(launcher)->highlight_bg = color != NULL ? color : self->highlight;
 
 	/* create menu */
+	MenuitemApplet *menu_about;
+	menu_about = menuitem_applet_new("About NyanBar", nyanbar_about);
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_about));
+	
+	GtkWidget *separator1;
+	separator1 = menu_separator_applet_new();
+	menubar_applet_add(MENU_APPLET(menu)->menubar, separator1);
+
+	MenuitemApplet *menu_kill;
+	menu_kill = menuitem_applet_new("Force Quit...", nyanbar_kill);
+	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_kill));
+
+	GtkWidget *separator2;
+	separator2 = menu_separator_applet_new();
+	menubar_applet_add(MENU_APPLET(menu)->menubar, separator2);
+
 	MenuitemApplet *menu_sleep;
-	menu_sleep = menuitem_applet_new("Sleep", NULL);
+	menu_sleep = menuitem_applet_new("Sleep", nyanbar_sleep);
 	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_sleep));
 
 	MenuitemApplet *menu_restart;
-	menu_restart = menuitem_applet_new("Restart...", "");
+	menu_restart = menuitem_applet_new("Restart...", nyanbar_restart);
 	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_restart));
 
 	MenuitemApplet *menu_shutdown;
-	menu_shutdown = menuitem_applet_new("Shut Down...", "");
+	menu_shutdown = menuitem_applet_new("Shut Down...", nyanbar_shutdown);
 	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_shutdown));
 
-	GtkWidget *separator;
-	separator = menu_separator_applet_new();
-	menubar_applet_add(MENU_APPLET(menu)->menubar, separator);
+	GtkWidget *separator3;
+	separator3 = menu_separator_applet_new();
+	menubar_applet_add(MENU_APPLET(menu)->menubar, separator3);
 	
 	MenuitemApplet *menu_logout;
-	menu_logout = menuitem_applet_new("Log Out...", "");
+	menu_logout = menuitem_applet_new("Log Out...", nyanbar_logout);
 	menubar_applet_add(MENU_APPLET(menu)->menubar, GTK_WIDGET(menu_logout));
 
 	/* TODO: settings should be set on object init
@@ -229,7 +246,11 @@ static void nyanbar_init(NyanBar *self)
 
 	/* menu separator color */
 	color = g_key_file_get_string(settings, "Menu Applet", "separator-color", &error);
-	MENU_SEPARATOR_APPLET(separator)->color = color != NULL ? color : self->fgcolor;
+	MENU_SEPARATOR_APPLET(separator1)->color = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Menu Applet", "separator-color", &error);
+	MENU_SEPARATOR_APPLET(separator2)->color = color != NULL ? color : self->fgcolor;
+	color = g_key_file_get_string(settings, "Menu Applet", "separator-color", &error);
+	MENU_SEPARATOR_APPLET(separator3)->color = color != NULL ? color : self->fgcolor;
 
 	/* menu applet icon colors */
 	color = g_key_file_get_string(settings, "Menu Applet", "icon-foreground", &error);

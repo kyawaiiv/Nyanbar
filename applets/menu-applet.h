@@ -51,7 +51,6 @@ struct _MenuApplet {
 	BarApplet parent;
 	GtkWidget *da;
 	MenubarApplet *menubar;
-	gboolean active;
 	gchar *fgcolor;
 	gchar *bgcolor;
 	gchar *hlcolor;

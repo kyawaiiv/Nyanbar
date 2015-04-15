@@ -45,9 +45,8 @@ static void menu_applet_init(MenuApplet *self)
 	gtk_widget_set_events(self->da, gtk_widget_get_events(self->da)
 	    | GDK_BUTTON_PRESS_MASK);
 
-	self->active = FALSE;
-
 	self->menubar = menubar_applet_new();
+	menubar_applet_set_owner(self->menubar, GTK_WIDGET(self));
 }
 
 static void menu_applet_class_init(MenuAppletClass *klass)
@@ -79,14 +78,10 @@ static gboolean on_update(GtkWidget *widget)
 
 static gboolean button_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	MENU_APPLET(user_data)->active = 
-	    MENU_APPLET(user_data)->active ? FALSE : TRUE;
-	gtk_widget_queue_draw(widget);
-
-	if(MENU_APPLET(user_data)->active)
-		menubar_applet_show(MENU_APPLET(user_data)->menubar, NULL);
+	if(!MENU_APPLET(user_data)->menubar->active)
+		menubar_applet_show(MENU_APPLET(user_data)->menubar);
 	else
-		menubar_applet_hide(MENU_APPLET(user_data)->menubar, NULL);
+		menubar_applet_hide(MENU_APPLET(user_data)->menubar);
 
 	return TRUE;
 }
@@ -101,7 +96,7 @@ static gboolean menu_applet_draw(GtkWidget *widget, cairo_t *cr, gpointer user_d
 	cairo_set_operator(cr, CAIRO_OPERATOR_ATOP);
 
 	/* fill background color */
-	gdk_rgba_parse(&c, MENU_APPLET(user_data)->active
+	gdk_rgba_parse(&c, MENU_APPLET(user_data)->menubar->active
 		       ? MENU_APPLET(user_data)->hlcolor
 		       : MENU_APPLET(user_data)->bgcolor);
 	cairo_set_source_rgba(cr, c.red, c.green, c.blue, 0.80);

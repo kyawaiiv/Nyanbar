@@ -50,6 +50,7 @@ typedef struct _MenubarAppletClass MenubarAppletClass;
 struct _MenubarApplet {
 	GtkWindow parent;
 	GtkWidget *layout;
+	GtkWidget *owner;
 	MenuitemApplet *menus[10];
 	int size;
 	gboolean active;
@@ -66,8 +67,10 @@ MenubarApplet *menubar_applet_new(void);
 
 void menubar_applet_add(MenubarApplet *menu, GtkWidget *menuitem);
 
-void menubar_applet_show(MenubarApplet *menu, gpointer user_data);
+void menubar_applet_show(MenubarApplet *menu);
 
-void menubar_applet_hide(MenubarApplet *menu, gpointer user_data);
+void menubar_applet_hide(MenubarApplet *menu);
+
+void menubar_applet_set_owner(MenubarApplet *menu, GtkWidget *owner);
 
 #endif
